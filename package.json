@@ -1,0 +1,15 @@
+{
+  "name": "multimedica-local-print-server",
+  "version": "0.1.0",
+  "private": true,
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "cors": "latest",
+    "dotenv": "latest",
+    "express": "latest",
+    "pngjs": "^7.0.0"
+  }
+}
