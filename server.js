@@ -244,6 +244,7 @@ const buildPatientTicket = (patient = {}) => {
   const locationName = clean(patient.location_name || "Clinica");
   const patientName = clean(patient.patient_name || "");
   const guardianName = clean(patient.guardian_name || "");
+  const organization = clean(patient.organization || "");
   const visitType = clean(patient.visit_type_label || patient.type_of_visit || "");
   const ptNo = clean(patient.pt_no || "");
   const locationMessage = clean(patient.location_message || "");
@@ -271,13 +272,22 @@ const buildPatientTicket = (patient = {}) => {
   chunks.push(sizeNormal(), boldOff());
   chunks.push(line(""));
 
-  if (guardianName && patient.age_group === "child") {
-    chunks.push(line(""));
-    chunks.push(boldOn(), line("Responsable:"), boldOff());
-    wrapText(guardianName, 48).forEach((wrappedLine) =>
-      chunks.push(line(wrappedLine)),
-    );
-  }
+if (guardianName && patient.age_group === "child") {
+  chunks.push(line(""));
+  chunks.push(boldOn(), line("Responsable:"), boldOff());
+  wrapText(guardianName, 48).forEach((wrappedLine) =>
+    chunks.push(line(wrappedLine)),
+  );
+}
+
+if (organization) {
+  chunks.push(line(""));
+  chunks.push(boldOn(), line("Organización:"), boldOff());
+
+  wrapText(organization, 48).forEach((wrappedLine) =>
+    chunks.push(line(wrappedLine)),
+  );
+}
 
   chunks.push(line(""));
   chunks.push(alignCenter());
@@ -291,7 +301,7 @@ const buildPatientTicket = (patient = {}) => {
   chunks.push(line(""));
 
 
-  wrapText("Presente este ticket en cada estacion.", 32).forEach(
+  wrapText("Presente este ticket en cada estación.", 32).forEach(
     (wrappedLine) => chunks.push(line(wrappedLine)),
   );
 
@@ -367,6 +377,14 @@ app.get("/health", (_req, res) => {
 
 app.post("/print/patient-ticket", async (req, res) => {
   try {
+
+     console.log(
+    `[${new Date().toISOString()}] PRINT REQUEST RECEIVED`,
+  );
+
+    console.log(JSON.stringify(req.body.pt_no, null, 2));
+    
+    
     const patient = req.body?.patient;
 
     if (!patient?.pt_no) {
@@ -386,7 +404,7 @@ app.post("/print/patient-ticket", async (req, res) => {
 
 app.listen(PRINT_SERVER_PORT, () => {
   console.log(
-    `ESC/POS print bridge listening on http://127.0.0.1:${PRINT_SERVER_PORT}`,
+    `ESC/POS print bridge listening on http://192.168.2.48:${PRINT_SERVER_PORT}`,
   );
   console.log(`Target printer: ${PRINTER_HOST || "<not configured>"}:${PRINTER_PORT}`);
 });
