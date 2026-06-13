@@ -17,6 +17,7 @@ const fs = require("fs");
 const path = require("path");
 const { PNG } = require("pngjs");
 require("dotenv").config();
+const os = require("os");
 
 const app = express();
 
@@ -26,6 +27,29 @@ const PRINTER_PORT = Number(process.env.PRINTER_PORT || 9100);
 
 app.use(cors({ origin: true }));
 app.use(express.json({ limit: "128kb" }));
+
+app.use((req, res, next) => {
+  console.log(
+    `[${new Date().toISOString()}] ${req.method} ${req.originalUrl}`,
+  );
+  next();
+});
+
+app.use((err, req, res, next) => {
+  if (err instanceof SyntaxError && err.status === 400 && "body" in err) {
+    console.error(
+      `[${new Date().toISOString()}] Invalid JSON request:`,
+      err.message,
+    );
+
+    return res.status(400).json({
+      ok: false,
+      error: "Invalid JSON request body.",
+    });
+  }
+
+  next(err);
+});
 
 const ESC = 0x1b;
 const GS = 0x1d;
@@ -43,6 +67,20 @@ const boldOff = () => bytes(ESC, 0x45, 0x00);
 const sizeNormal = () => bytes(GS, 0x21, 0x00);
 const sizeDoubleHeight = () => bytes(GS, 0x21, 0x01);
 const sizeDoubleWidthHeight = () => bytes(GS, 0x21, 0x11);
+
+const getLocalIp = () => {
+  const interfaces = os.networkInterfaces();
+
+  for (const addresses of Object.values(interfaces)) {
+    for (const address of addresses || []) {
+      if (address.family === "IPv4" && !address.internal) {
+        return address.address;
+      }
+    }
+  }
+
+  return "localhost";
+};
 
 const feedAndCut = () =>
   bytes(
@@ -378,11 +416,21 @@ app.get("/health", (_req, res) => {
 app.post("/print/patient-ticket", async (req, res) => {
   try {
 
-     console.log(
-    `[${new Date().toISOString()}] PRINT REQUEST RECEIVED`,
-  );
+console.log(
+  `[${new Date().toISOString()}] PRINT REQUEST RECEIVED`,
+);
 
-    console.log(JSON.stringify(req.body.pt_no, null, 2));
+console.log(
+  JSON.stringify(
+    {
+      pt_no: req.body?.patient?.pt_no,
+      patient_name: req.body?.patient?.patient_name,
+      location_name: req.body?.patient?.location_name,
+    },
+    null,
+    2,
+  ),
+);
     
     
     const patient = req.body?.patient;
@@ -403,8 +451,13 @@ app.post("/print/patient-ticket", async (req, res) => {
 });
 
 app.listen(PRINT_SERVER_PORT, () => {
+  const hostIp = getLocalIp();
+
   console.log(
-    `ESC/POS print bridge listening on http://192.168.2.48:${PRINT_SERVER_PORT}`,
+    `ESC/POS print bridge (this server) listening on http://${hostIp}:${PRINT_SERVER_PORT}`,
   );
-  console.log(`Target printer: ${PRINTER_HOST || "<not configured>"}:${PRINTER_PORT}`);
+
+  console.log(
+    `Target printer loaded from .env file: ${PRINTER_HOST || "<not configured>"}:${PRINTER_PORT}`,
+  );
 });
