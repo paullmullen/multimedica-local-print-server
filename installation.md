@@ -28,13 +28,13 @@ The thermal ticket printer does not accept a normal Windows print job. It expect
 
 ![How Multimedica prints thermal tickets](assets/local-print-server-architecture.svg)
 
-The two network addresses have different meanings:
+The lettered markers in the illustration correspond to the settings below. The two network addresses have different meanings:
 
-| Setting | Example | Meaning |
-|---|---|---|
-| Print server URL | `http://192.168.2.48:3333` | Windows computer running this application |
-| Printer host | `192.168.2.69` | Thermal printer receiving ESC/POS data |
-| Printer port | `9100` | Raw TCP print port on the thermal printer |
+| Diagram marker | Setting | Example | Meaning |
+|---|---|---|---|
+| **A** | Print server URL | `http://192.168.2.48:3333` | Windows computer running this application |
+| **B** | Printer host | `192.168.2.69` | Thermal printer receiving ESC/POS data |
+| **C** | Printer port | `9100` | Raw TCP print port on the thermal printer |
 
 Do not enter the printer's IP address as the print server URL.
 
