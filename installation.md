@@ -24,6 +24,10 @@ The print server is a small Node.js application named `multimedica-local-print-s
 
 The host computer does not have to be the registration computer, but it must remain powered on while thermal tickets are needed. Do not install the print server on the Raspberry Pi scanner appliance.
 
+The thermal ticket printer does not accept a normal Windows print job. It expects ESC/POS commands. As illustrated below, the local print server receives the application's print request, translates it into ESC/POS commands, and sends those commands directly to the printer.
+
+![How Multimedica prints thermal tickets](assets/local-print-server-architecture.svg)
+
 The two network addresses have different meanings:
 
 | Setting | Example | Meaning |
