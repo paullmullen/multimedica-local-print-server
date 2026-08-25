@@ -26,7 +26,7 @@ The host computer does not have to be the registration computer, but it must rem
 
 The thermal ticket printer does not accept a normal Windows print job. It expects ESC/POS commands. As illustrated below, the local print server receives the application's print request, translates it into ESC/POS commands, and sends those commands directly to the printer.
 
-![How Multimedica prints thermal tickets](assets/local-print-server-architecture.svg)
+![How Multimedica prints thermal tickets](assets/local-print-server-architecture-v2.svg)
 
 The lettered markers in the illustration correspond to the settings below. The two network addresses have different meanings:
 
